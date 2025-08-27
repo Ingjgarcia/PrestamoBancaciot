@@ -15,10 +15,6 @@
   </ItemGroup>
 
   <ItemGroup>
-    <Folder Include="Persistence\Repositories\" />
-  </ItemGroup>
-
-  <ItemGroup>
     <ProjectReference Include="..\PrestamoBancario.Application\PrestamoBancario.Application.csproj" />
     <ProjectReference Include="..\PrestamoBancario.Domain\PrestamoBancario.Domain.csproj" />
   </ItemGroup>

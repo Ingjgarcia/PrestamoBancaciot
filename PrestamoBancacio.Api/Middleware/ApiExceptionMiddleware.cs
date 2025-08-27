@@ -12,6 +12,7 @@
             try { await _next(ctx); }
             catch (KeyNotFoundException ex) { await Write(ctx, 404, ex.Message); }
             catch (ArgumentException ex) { await Write(ctx, 400, ex.Message); }
+            catch (AccessViolationException ex) { await Write(ctx, 403, ex.Message); }
             catch (InvalidOperationException ex) { await Write(ctx, 409, ex.Message); }
             catch (Exception ex) { _logger.LogError(ex, "error no manejado"); await Write(ctx, 500, "Error interno del servidor"); }
         }
@@ -21,6 +22,9 @@
             ctx.Response.StatusCode = status; ctx.Response.ContentType = "application/json";
             await ctx.Response.WriteAsJsonAsync(new { message });
         }
+
+       
+
     }
 
 }

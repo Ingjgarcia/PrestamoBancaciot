@@ -1,5 +1,10 @@
-﻿using Microsoft.AspNetCore.Identity.Data;
+﻿using MediatR;
+using Microsoft.AspNetCore.Identity.Data;
 using Microsoft.AspNetCore.Mvc;
+using PrestamoBancario.Application.Auth.Command;
+using PrestamoBancario.Application.Auth.Dtos;
+using PrestamoBancario.Application.Auth.Querys;
+using PrestamoBancario.Application.PrestamosFeature.Command;
 using PrestamoBancario.Domain.Constracts.Repository;
 using PrestamoBancario.Domain.Entities;
 
@@ -7,37 +12,35 @@ namespace PrestamoBancacio.Api.Controllers
 {
     public class AuthController : Controller
     {
-        private readonly IUsuarioRepository _users;
-        private readonly IPasswordHasher _hasher;
-        private readonly ITokenService _tokens;
+        private readonly IMediator _mediator;
 
-        public AuthController(IUsuarioRepository users, IPasswordHasher hasher, ITokenService tokens)
-        { _users = users; _hasher = hasher; _tokens = tokens; 
+        AuthController(IMediator mediator)
+        {
+            _mediator = mediator;
         }
 
         [HttpPost("register")]
-        public async Task<ActionResult> Register([FromBody] RegisterRequest req, CancellationToken ct)
+        public async Task<UsuarioDto> Register([FromBody] UsuarioCreateDto req, CancellationToken ct)
         {
-            var exists = await _users.GetByEmailAsync(req.Email, ct);
-            if (exists != null) return Conflict(new { message = "correo ya Registrado" });
-            var user = new Usuario { Email = req.Email, Constrasena = _hasher.Hash(req.Password), Rol = req.IsAdmin ? Roles.Admin : Roles.User };
-            await _users.AddAsync(user, ct);
-            var token = _tokens.CreateToken(user);
-            return Ok(new { token, email = user.Email, role = user.Rol });
+            var exists = await _mediator.Send(new GetUsuarioCommand() { email = req.Email });
+
+            if (exists) throw new ArgumentException( "correo ya Registrado");
+           
+            return await _mediator.Send(new RegistroUsuarioCommand() { Usuario = req });
         }
 
         [HttpPost("login")]
-        public async Task<ActionResult> Login([FromBody] LoginRequest req, CancellationToken ct)
+        public async Task<UsuarioDto> Login([FromBody] UsuarioLoginDto req, CancellationToken ct)
         {
-            var user = await _users.GetByEmailAsync(req.Email, ct);
-            if (user == null || !_hasher.Verify(req.Password, user.Constrasena))
-                return Unauthorized(new { message = "Usuario o contraseña no valido" });
-            var token = _tokens.CreateToken(user);
-            return Ok(new { token, email = user.Email, role = user.Rol });
+            var user = await _mediator.Send(new LoginQuery() { Usuario = req });
+
+           
+            if (user == null)
+                throw new  AccessViolationException("Usuario o contraseña no valido");
+
+            return user;
         }
 
     }
 }
 
-public record RegisterRequest(string Email, string Password, bool IsAdmin = false);
-public record LoginRequest(string Email, string Password);

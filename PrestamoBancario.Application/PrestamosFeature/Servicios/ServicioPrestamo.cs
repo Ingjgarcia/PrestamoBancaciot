@@ -2,9 +2,9 @@
 using PrestamoBancario.Domain.Constracts.Repository;
 using PrestamoBancario.Domain.Entities;
 
-namespace PrestamoBancario.Application.Servicios
+namespace PrestamoBancario.Application.PrestamosFeature.Servicios
 {
-    internal class ServicioPrestamo 
+    internal class ServicioPrestamo
     {
         private readonly IPrestamoRepository _prestamo;
         private readonly IUnitOfWork _uow;
@@ -13,11 +13,11 @@ namespace PrestamoBancario.Application.Servicios
         public ServicioPrestamo(IPrestamoRepository prestamo, IUnitOfWork uow, ILogger<ServicioPrestamo> logger)
         { _prestamo = prestamo; _uow = uow; _logger = logger; }
 
-        public async Task<Prestamo> CrearAsync(Guid idUsuario, decimal cantidad, int tiempo, CancellationToken ct)
+        public async Task<Prestamo_> CrearAsync(Guid idUsuario, decimal cantidad, int tiempo, CancellationToken ct)
         {
             if (cantidad <= 0) throw new ArgumentException("cantidad debe ser mayor que cero");
             if (tiempo <= 0) throw new ArgumentException("el tiempo debe ser mayor a cero");
-            var loan = new Prestamo { IdUsuario = idUsuario, Cantida = cantidad, Tiempo = tiempo };
+            var loan = new Prestamo_ { IdUsuario = idUsuario, Cantidad = cantidad, Tiempo = tiempo };
             await _prestamo.AddAsync(loan, ct);
             return loan;
         }
@@ -40,7 +40,7 @@ namespace PrestamoBancario.Application.Servicios
             }
         }
 
-        public async Task DenegarAsync(Guid id, string adminEmail, CancellationToken ct)
+        public async Task RechazarAsync(Guid id, string adminEmail, CancellationToken ct)
         {
             await _uow.BeginTransactionAsync(ct);
             try

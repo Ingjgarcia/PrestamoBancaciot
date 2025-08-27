@@ -1,13 +1,8 @@
 ﻿
 using Microsoft.Extensions.Caching.Memory;
+using PrestamoBancario.Domain.Constracts.Repository;
 
 namespace PrestamoBancario.Infrastructure.Cache;
-
-public interface ICache
-{
-    Task<T?> GetOrSetAsync<T>(string key, Func<Task<T>> factory, TimeSpan ttl);
-    void Remove(string key);
-}
 
 public class MemoryCacheAdapter : ICache
 {

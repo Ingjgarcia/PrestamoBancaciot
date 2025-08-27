@@ -5,8 +5,8 @@ namespace PrestamoBancario.Infraestructure.Persistence;
 
 internal class AppDbContext : DbContext
 {
-    public DbSet<Usuario> Users => Set<Usuario>();
-    public DbSet<Prestamo> Loans => Set<Prestamo>();
+    public DbSet<Usuario> Usuarios => Set<Usuario>();
+    public DbSet<Prestamo_> Prestamos => Set<Prestamo_>();
 
     public AppDbContext(DbContextOptions<AppDbContext> options) : base(options) { }
 
@@ -21,10 +21,10 @@ internal class AppDbContext : DbContext
             e.Property(x => x.Rol).IsRequired();
         });
 
-        modelBuilder.Entity<Prestamo>(e =>
+        modelBuilder.Entity<Prestamo_>(e =>
         {
             e.HasKey(x => x.Id);
-            e.Property(x => x.Cantida).HasPrecision(18, 2);
+            e.Property(x => x.Cantidad).HasPrecision(18, 2);
             e.Property(x => x.Estado).HasConversion<int>();
             e.HasIndex(x => new { x.IdUsuario, x.FechaCreacion });
         });

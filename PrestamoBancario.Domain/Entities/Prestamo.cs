@@ -2,11 +2,11 @@
 
 namespace PrestamoBancario.Domain.Entities
 {
-    internal class Prestamo
+    internal class Prestamo_
     {
         public Guid Id { get; set; }
         public Guid IdUsuario { get; set; }
-        public decimal Cantida { get; set; }
+        public decimal Cantidad { get; set; }
         public int Tiempo { get; set; }
         public EstadoPrestamo Estado { get; set; }
         public DateTime FechaCreacion { get; set; }

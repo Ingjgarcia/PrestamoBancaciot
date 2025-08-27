@@ -1,76 +1,70 @@
-﻿using Microsoft.AspNetCore.Authorization;
+﻿using MediatR;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using PrestamoBancario.Application.Dtos;
-using PrestamoBancario.Domain.Constracts.Repository;
-using PrestamoBancario.Infrastructure.Cache;
+using PrestamoBancario.Application.PrestamosFeature.Command;
+using PrestamoBancario.Application.PrestamosFeature.Dtos;
+using PrestamoBancario.Application.PrestamosFeature.Querys;
 
 namespace PrestamoBancacio.Api.Controllers
 {
     public class PrestamoController : Controller
     {
-        private readonly ServicioPrestamo _service;
-        private readonly IPrestamoRepository _prestamos;
-        private readonly IUsuarioRepository _users;
-        private readonly ICache _cache;
+        private readonly IMediator _mediator;
 
-
+        PrestamoController (IMediator mediator) => _mediator = mediator;
         private Guid GetUserId() => Guid.Parse(User.FindFirst("sub")!.Value);
         private string GetEmail() => User.FindFirst("email")!.Value;
 
         [Authorize]
         [HttpPost]
-        public async Task<ActionResult> Add([FromBody] PrestamoDto req, CancellationToken ct)
+        public async Task<PrestamoDto> Add([FromBody] PrestamoCreateDto req, CancellationToken ct)
         {
-            var userId = GetUserId();
-            var prestamo = await _service.CreateAsync(userId, req.Cantidad, req.Tiempo, ct);
-            return CreatedAtAction(nameof(GetById), new { id = prestamo.Id }, prestamo);
+            req.IdUsuario = GetUserId();
+            return await _mediator.Send(new AddPrestamoCommand() { Prestamo = req });
         }
 
         [Authorize]
         [HttpGet("{id:guid}")]
-        public async Task<ActionResult> GetById(Guid id, CancellationToken ct)
+        public async Task<PrestamoDto> GetById(Guid id, CancellationToken ct)
         {
-            var cacheKey = $"prestamo:{id}";
-            var prestamo = await _cache.GetOrSetAsync(cacheKey, async () => await _prestamos.GetByIdAsync(id, ct), TimeSpan.FromSeconds(30));
-            if (prestamo == null) return NotFound(new { message = "Prestamo" });
-            if (User.IsInRole("User") && prestamo.IdUsuario != GetUserId()) return Forbid();
-            return Ok(prestamo);
+            var prestamo = await _mediator.Send(new GetByIdPrestamoQuery { Id = id }, ct);
+
+            if (prestamo == null)
+                throw new KeyNotFoundException("Prestamo no encontrado" );
+
+            if (User.IsInRole("User") && prestamo.IdUsuario != GetUserId())
+                throw new AccessViolationException("no tiene permiso para esta accion");
+
+            return prestamo;
         }
 
         [Authorize]
         [HttpGet("GetAll")]
-        public async Task<ActionResult> GetAll(CancellationToken ct)
+        public async Task<IEnumerable<PrestamoDto>> GetAll(CancellationToken ct)
         {
-            var userId = GetUserId();
-            var cacheKey = $"prestamo:usuario:{userId}";
-            var prestamos = await _cache.GetOrSetAsync(cacheKey, async () => await _prestamos.GetByUserAsync(userId, ct), TimeSpan.FromSeconds(15));
-            return Ok(prestamos);
+            return await _mediator.Send(new GetPrestamoQuery() { IdUsuario = GetUserId() });
         }
 
         [Authorize(Policy = "AdminOnly")]
         [HttpGet("prestamos-pendientes")]
-        public async Task<ActionResult> Pendientes(CancellationToken ct)
+        public async Task<IEnumerable<PrestamoDto>> Pendientes(CancellationToken ct)
         {
-            var prestamos = await _prestamos.GetPendingAsync(ct);
-            return Ok(prestamos);
+            return await _mediator.Send(new GetPendientesPrestamoQuery());
         }
 
         [Authorize(Policy = "AdminOnly")]
-        [HttpPost("{id:guid}/approvar")]
-        public async Task<IActionResult> Approvar(Guid id, CancellationToken ct)
+        [HttpPost("{id:guid}/approbar")]
+        public async Task Approbar(Guid id, CancellationToken ct)
         {
-            await _service.ApproveAsync(id, GetEmail(), ct);
-            _cache.Remove($"Prestamo:{id}");
-            return NoContent();
+            await _mediator.Send(new AprobarPrestamoCommand { Id = id, AdminUser = GetEmail() }, ct);
         }
 
         [Authorize(Policy = "AdminOnly")]
         [HttpPost("{id:guid}/rechazar")]
-        public async Task<IActionResult> Reject(Guid id, CancellationToken ct)
+        public async Task Rechazar(Guid id, CancellationToken ct)
         {
-            await _service.RejectAsync(id, GetEmail(), ct);
-            _cache.Remove($"loan:{id}");
-            return NoContent();
+            await _mediator.Send(new RechazarPrestamoCommand { Id = id, AdminUser = GetEmail() }, ct);
+
         }
     }
 }
