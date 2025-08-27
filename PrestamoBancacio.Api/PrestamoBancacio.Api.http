@@ -1,0 +1,6 @@
+@PrestamoBancacio.Api_HostAddress = http://localhost:5026
+
+GET {{PrestamoBancacio.Api_HostAddress}}/weatherforecast/
+Accept: application/json
+
+###
