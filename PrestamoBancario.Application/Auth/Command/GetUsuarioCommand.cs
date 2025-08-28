@@ -1,5 +1,4 @@
 ﻿using MediatR;
-using PrestamoBancario.Application.Auth.Dtos;
 
 namespace PrestamoBancario.Application.Auth.Command
 {

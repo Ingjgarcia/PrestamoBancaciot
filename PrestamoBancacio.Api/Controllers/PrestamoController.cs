@@ -11,7 +11,7 @@ namespace PrestamoBancacio.Api.Controllers
     {
         private readonly IMediator _mediator;
 
-        PrestamoController (IMediator mediator) => _mediator = mediator;
+        public PrestamoController (IMediator mediator) => _mediator = mediator;
         private Guid GetUserId() => Guid.Parse(User.FindFirst("sub")!.Value);
         private string GetEmail() => User.FindFirst("email")!.Value;
 

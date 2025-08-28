@@ -1,12 +1,8 @@
 ﻿using MediatR;
-using Microsoft.AspNetCore.Identity.Data;
 using Microsoft.AspNetCore.Mvc;
 using PrestamoBancario.Application.Auth.Command;
 using PrestamoBancario.Application.Auth.Dtos;
 using PrestamoBancario.Application.Auth.Querys;
-using PrestamoBancario.Application.PrestamosFeature.Command;
-using PrestamoBancario.Domain.Constracts.Repository;
-using PrestamoBancario.Domain.Entities;
 
 namespace PrestamoBancacio.Api.Controllers
 {
@@ -14,7 +10,7 @@ namespace PrestamoBancacio.Api.Controllers
     {
         private readonly IMediator _mediator;
 
-        AuthController(IMediator mediator)
+        public AuthController(IMediator mediator)
         {
             _mediator = mediator;
         }
