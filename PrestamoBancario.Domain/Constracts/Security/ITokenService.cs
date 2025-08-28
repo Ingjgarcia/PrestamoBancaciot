@@ -1,6 +1,6 @@
 ﻿using PrestamoBancario.Domain.Entities;
 
-namespace PrestamoBancario.Domain.Constracts.Repository
+namespace PrestamoBancario.Domain.Constracts.Security
 {
     internal interface ITokenService
     {

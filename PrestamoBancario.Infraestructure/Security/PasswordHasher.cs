@@ -1,4 +1,4 @@
-﻿using PrestamoBancario.Domain.Constracts.Repository;
+﻿using PrestamoBancario.Domain.Constracts.Security;
 
 namespace PrestamoBancario.Infraestructure.Security
 {

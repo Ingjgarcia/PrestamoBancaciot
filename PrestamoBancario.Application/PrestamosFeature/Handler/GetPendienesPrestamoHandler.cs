@@ -1,28 +1,29 @@
 ﻿using MediatR;
 using PrestamoBancario.Application.PrestamosFeature.Dtos;
 using PrestamoBancario.Application.PrestamosFeature.Querys;
-using PrestamoBancario.Domain.Constracts.Repository;
+using PrestamoBancario.Domain.Constracts;
 
 namespace PrestamoBancario.Application.PrestamosFeature.Handler
 {
     internal class GetPendienesPrestamoHandler : IRequestHandler<GetPendientesPrestamoQuery, IEnumerable<PrestamoDto>>
     {
-        private readonly IPrestamoRepository _prestamo;
+        private readonly IUnitOfWork _unitOfWork;
 
-        public GetPendienesPrestamoHandler(IPrestamoRepository prestamo)
+        public GetPendienesPrestamoHandler(IUnitOfWork unitOfWork)
         {
-            _prestamo = prestamo;
+            _unitOfWork = unitOfWork;
 
         }
         public async Task<IEnumerable<PrestamoDto>> Handle(GetPendientesPrestamoQuery request, CancellationToken cancellationToken)
         {
-            var prestamos = await _prestamo.GetPendingAsync(cancellationToken);
+            var prestamos = await _unitOfWork.Prestamos.GetPendingAsync(cancellationToken);
             var response = prestamos.Select(x => new PrestamoDto
             {
                 Id = x.Id,
                 Cantidad = x.Cantidad,
                 Tiempo = x.Tiempo,
-                Estado = x.Estado
+                Estado = x.Estado,
+                IdUsuario = x.IdUsuario
             }).ToList();
 
             return response;

@@ -1,4 +1,5 @@
 ﻿using MediatR;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using PrestamoBancario.Application.Auth.Command;
 using PrestamoBancario.Application.Auth.Dtos;
@@ -18,23 +19,21 @@ namespace PrestamoBancacio.Api.Controllers
         [HttpPost("register")]
         public async Task<UsuarioDto> Register([FromBody] UsuarioCreateDto req, CancellationToken ct)
         {
-            var exists = await _mediator.Send(new GetUsuarioCommand() { email = req.Email });
-
-            if (exists) throw new ArgumentException( "correo ya Registrado");
-           
             return await _mediator.Send(new RegistroUsuarioCommand() { Usuario = req });
         }
 
         [HttpPost("login")]
         public async Task<UsuarioDto> Login([FromBody] UsuarioLoginDto req, CancellationToken ct)
         {
-            var user = await _mediator.Send(new LoginQuery() { Usuario = req });
+            return await _mediator.Send(new LoginQuery() { Usuario = req });
+        }
 
-           
-            if (user == null)
-                throw new  AccessViolationException("Usuario o contraseña no valido");
-
-            return user;
+        [Authorize]
+        [HttpGet("claims")]
+        public IActionResult GetClaims()
+        {
+            var claims = User.Claims.Select(c => new { c.Type, c.Value });
+            return Ok(claims);
         }
 
     }

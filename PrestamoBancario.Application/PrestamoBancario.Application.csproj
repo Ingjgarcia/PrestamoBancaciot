@@ -14,5 +14,8 @@
   <ItemGroup>
     <ProjectReference Include="..\PrestamoBancario.Domain\PrestamoBancario.Domain.csproj" />
   </ItemGroup>
+  <ItemGroup>
+    <InternalsVisibleTo Include="PrestamoBancario.Infraestructure" />
+  </ItemGroup>
 
 </Project>

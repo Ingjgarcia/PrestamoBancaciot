@@ -1,19 +1,15 @@
-using LoanManagement.Infrastructure.Persistence.Repositories;
-using MediatR;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
-using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
-using PrestamoBancacio.Api.Controllers;
 using PrestamoBancacio.Api.Middleware;
-using PrestamoBancario.Application.Auth.Command;
-using PrestamoBancario.Domain.Constracts.Repository;
 using PrestamoBancario.Infraestructure.Persistence;
 using PrestamoBancario.Infraestructure.Security;
 using PrestamoBancario.Infrastructure.Cache;
-using PrestamoBancario.Infrastructure.Persistence.Repositories;
-using System;
+using PrestamoBancario.Application;
 using System.Text;
+using PrestamoBancario.Domain.Constracts.Security;
+using PrestamoBancario.Domain.Constracts;
+using Microsoft.OpenApi.Models;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -21,19 +17,8 @@ var builder = WebApplication.CreateBuilder(args);
 builder.Services.AddDbContext<AppDbContext>(opt =>
     opt.UseNpgsql(builder.Configuration.GetConnectionString("Default") ?? builder.Configuration["ConnectionStrings:Default"]));
 
-//Dependency inyection
-builder.Services.AddMediatR(cfg =>
-{
-    cfg.RegisterServicesFromAssembly(typeof(AuthController).Assembly);
-    cfg.RegisterServicesFromAssembly(typeof(PrestamoController).Assembly);
-
-});
-
-builder.Services.AddScoped<IPrestamoRepository, PrestamoRepository>();
-builder.Services.AddScoped<IUsuarioRepository, UsuarioRepository>();
+builder.Services.AddApplication();
 builder.Services.AddScoped<IUnitOfWork, UnitOfWork>();
-//builder.Services.AddScoped<ServicioPrestamo>();
-builder.Services.AddSingleton<IPasswordHasher, PasswordHasher>();
 builder.Services.AddSingleton<ITokenService, TokenService>();
 builder.Services.AddMemoryCache();
 builder.Services.AddSingleton<ICache, MemoryCacheAdapter>();
@@ -41,7 +26,30 @@ builder.Services.AddSingleton<ICache, MemoryCacheAdapter>();
 
 builder.Services.AddControllers();
 builder.Services.AddEndpointsApiExplorer();
-builder.Services.AddSwaggerGen();
+builder.Services.AddSwaggerGen(options =>
+{
+    options.SwaggerDoc("v1", new() { Title = "PrestamoBancario API", Version = "v1" });
+
+    // Configuración de seguridad JWT
+    options.AddSecurityDefinition("Bearer", new()
+    {
+        Name = "Authorization",
+        Type = SecuritySchemeType.Http,
+        Scheme = "Bearer",
+        BearerFormat = "JWT",
+        In = ParameterLocation.Header,
+        Description = "Ingresa el token JWT en este formato: Bearer {token}"
+    });
+
+    options.AddSecurityRequirement(new()
+    {
+        {
+            new() { Reference = new() { Type = ReferenceType.SecurityScheme, Id = "Bearer" } },
+            Array.Empty<string>()
+        }
+    });
+});
+
 
 // JWT
 var key = builder.Configuration["Jwt:Key"] ?? "dev-secret";
@@ -83,9 +91,8 @@ if (app.Environment.IsDevelopment())
 }
 
 app.UseHttpsRedirection();
-
+app.UseAuthentication();
 app.UseAuthorization();
-
 app.MapControllers();
 
 app.Run();

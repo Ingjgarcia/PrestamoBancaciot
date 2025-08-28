@@ -12,8 +12,8 @@ using PrestamoBancario.Infraestructure.Persistence;
 namespace PrestamoBancario.Infraestructure.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    [Migration("20250828025503_InicialPrestamos")]
-    partial class InicialPrestamos
+    [Migration("20250828212346_Initials")]
+    partial class Initials
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -25,7 +25,7 @@ namespace PrestamoBancario.Infraestructure.Migrations
 
             NpgsqlModelBuilderExtensions.UseIdentityByDefaultColumns(modelBuilder);
 
-            modelBuilder.Entity("PrestamoBancario.Domain.Entities.Prestamo_", b =>
+            modelBuilder.Entity("PrestamoBancario.Domain.Entities.Prestamo", b =>
                 {
                     b.Property<Guid>("Id")
                         .ValueGeneratedOnAdd()
@@ -41,7 +41,7 @@ namespace PrestamoBancario.Infraestructure.Migrations
                     b.Property<DateTime>("FechaCreacion")
                         .HasColumnType("timestamp with time zone");
 
-                    b.Property<DateTime>("FechaModificacion")
+                    b.Property<DateTime?>("FechaModificacion")
                         .HasColumnType("timestamp with time zone");
 
                     b.Property<Guid>("IdUsuario")
@@ -50,16 +50,10 @@ namespace PrestamoBancario.Infraestructure.Migrations
                     b.Property<int>("Tiempo")
                         .HasColumnType("integer");
 
-                    b.Property<Guid>("UsuarioId")
+                    b.Property<Guid?>("UsuarioModificacion")
                         .HasColumnType("uuid");
 
-                    b.Property<string>("UsuarioModificacion")
-                        .IsRequired()
-                        .HasColumnType("text");
-
                     b.HasKey("Id");
-
-                    b.HasIndex("UsuarioId");
 
                     b.HasIndex("IdUsuario", "FechaCreacion");
 
@@ -93,17 +87,6 @@ namespace PrestamoBancario.Infraestructure.Migrations
                         .IsUnique();
 
                     b.ToTable("Usuarios");
-                });
-
-            modelBuilder.Entity("PrestamoBancario.Domain.Entities.Prestamo_", b =>
-                {
-                    b.HasOne("PrestamoBancario.Domain.Entities.Usuario", "Usuario")
-                        .WithMany()
-                        .HasForeignKey("UsuarioId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.Navigation("Usuario");
                 });
 #pragma warning restore 612, 618
         }

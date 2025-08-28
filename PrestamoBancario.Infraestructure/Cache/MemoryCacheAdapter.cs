@@ -1,6 +1,6 @@
 ﻿
 using Microsoft.Extensions.Caching.Memory;
-using PrestamoBancario.Domain.Constracts.Repository;
+using PrestamoBancario.Domain.Constracts;
 
 namespace PrestamoBancario.Infrastructure.Cache;
 

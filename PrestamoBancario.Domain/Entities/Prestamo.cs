@@ -2,7 +2,7 @@
 
 namespace PrestamoBancario.Domain.Entities
 {
-    internal class Prestamo_
+    internal class Prestamo
     {
         public Guid Id { get; set; }
         public Guid IdUsuario { get; set; }
@@ -10,12 +10,10 @@ namespace PrestamoBancario.Domain.Entities
         public int Tiempo { get; set; }
         public EstadoPrestamo Estado { get; set; }
         public DateTime FechaCreacion { get; set; }
-        public DateTime FechaModificacion { get; set; }
-        public string  UsuarioModificacion { get; set; }
+        public DateTime? FechaModificacion { get; set; }
+        public Guid?  UsuarioModificacion { get; set; }
 
-        public Usuario Usuario { get; set; }
-
-        public void Aprobar(string adminUser)
+        public void Aprobar(Guid adminUser)
         {
             if (Estado != EstadoPrestamo.pendiente)
                 throw new InvalidOperationException("Slo prestamos pendientes pueden ser aprobados.");
@@ -24,7 +22,7 @@ namespace PrestamoBancario.Domain.Entities
             UsuarioModificacion = adminUser;
         }
 
-        public void Rechazar(string adminUser)
+        public void Rechazar(Guid adminUser)
         {
             if (Estado != EstadoPrestamo.pendiente)
                 throw new InvalidOperationException("solo prestamos pendientes pueden ser Denegados.");

@@ -12,11 +12,10 @@ namespace PrestamoBancacio.Api.Controllers
         private readonly IMediator _mediator;
 
         public PrestamoController (IMediator mediator) => _mediator = mediator;
-        private Guid GetUserId() => Guid.Parse(User.FindFirst("sub")!.Value);
-        private string GetEmail() => User.FindFirst("email")!.Value;
+        private Guid GetUserId() => Guid.Parse(User.FindFirst("Userid")!.Value);
 
         [Authorize]
-        [HttpPost]
+        [HttpPost("Add")]
         public async Task<PrestamoDto> Add([FromBody] PrestamoCreateDto req, CancellationToken ct)
         {
             req.IdUsuario = GetUserId();
@@ -28,9 +27,6 @@ namespace PrestamoBancacio.Api.Controllers
         public async Task<PrestamoDto> GetById(Guid id, CancellationToken ct)
         {
             var prestamo = await _mediator.Send(new GetByIdPrestamoQuery { Id = id }, ct);
-
-            if (prestamo == null)
-                throw new KeyNotFoundException("Prestamo no encontrado" );
 
             if (User.IsInRole("User") && prestamo.IdUsuario != GetUserId())
                 throw new AccessViolationException("no tiene permiso para esta accion");
@@ -56,14 +52,14 @@ namespace PrestamoBancacio.Api.Controllers
         [HttpPost("{id:guid}/approbar")]
         public async Task Approbar(Guid id, CancellationToken ct)
         {
-            await _mediator.Send(new AprobarPrestamoCommand { Id = id, AdminUser = GetEmail() }, ct);
+            await _mediator.Send(new AprobarPrestamoCommand { Id = id, AdminUser = GetUserId() }, ct);
         }
 
         [Authorize(Policy = "AdminOnly")]
         [HttpPost("{id:guid}/rechazar")]
         public async Task Rechazar(Guid id, CancellationToken ct)
         {
-            await _mediator.Send(new RechazarPrestamoCommand { Id = id, AdminUser = GetEmail() }, ct);
+            await _mediator.Send(new RechazarPrestamoCommand { Id = id, AdminUser = GetUserId() }, ct);
 
         }
     }

@@ -14,6 +14,7 @@
             catch (ArgumentException ex) { await Write(ctx, 400, ex.Message); }
             catch (AccessViolationException ex) { await Write(ctx, 403, ex.Message); }
             catch (InvalidOperationException ex) { await Write(ctx, 409, ex.Message); }
+            catch (UnauthorizedAccessException ex) { await Write(ctx, 403, "Acceso denegado: solo administradores pueden acceder"); }
             catch (Exception ex) { _logger.LogError(ex, "error no manejado"); await Write(ctx, 500, "Error interno del servidor"); }
         }
 

@@ -29,6 +29,10 @@
     <InternalsVisibleTo Include="PrestamoBancario.Api" />
   </ItemGroup>
 
+  <ItemGroup>
+    <Folder Include="Migrations\" />
+  </ItemGroup>
+
   
 
 </Project>
