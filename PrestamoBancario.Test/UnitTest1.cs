@@ -1,8 +1,10 @@
+using Xunit;
 namespace PrestamoBancario.Test
 {
     public class UnitTest1
     {
-        [Fact]
+        //[Fact]
+
         public void Test1()
         {
 

@@ -9,5 +9,6 @@
     <InternalsVisibleTo Include="PrestamoBancario.Application" />
     <InternalsVisibleTo Include="PrestamoBancario.Infraestructure" />
     <InternalsVisibleTo Include="PrestamoBancario.Api" />
+    <InternalsVisibleTo Include="PrestamoBancario.Test" />
   </ItemGroup>
 </Project>

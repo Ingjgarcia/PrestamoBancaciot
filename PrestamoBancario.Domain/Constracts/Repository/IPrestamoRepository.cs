@@ -10,6 +10,5 @@ namespace PrestamoBancario.Domain.Constracts.Repository
         Task<IReadOnlyList<Prestamo>> GetByUserAsync(long idUsuario, CancellationToken ct);
         Task<IReadOnlyList<Prestamo>> GetAllAsync(CancellationToken ct);
         Task<IReadOnlyList<Prestamo>> GetPendingAsync(CancellationToken ct);
-        
     }
 }

@@ -16,6 +16,8 @@
   </ItemGroup>
   <ItemGroup>
     <InternalsVisibleTo Include="PrestamoBancario.Infraestructure" />
+    <InternalsVisibleTo Include="PrestamoBancario.Test" />
+
   </ItemGroup>
 
 </Project>

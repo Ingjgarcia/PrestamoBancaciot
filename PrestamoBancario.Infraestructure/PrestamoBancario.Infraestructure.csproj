@@ -27,6 +27,7 @@
     <ProjectReference Include="..\PrestamoBancario.Application\PrestamoBancario.Application.csproj" />
     <ProjectReference Include="..\PrestamoBancario.Domain\PrestamoBancario.Domain.csproj" />
     <InternalsVisibleTo Include="PrestamoBancario.Api" />
+    <InternalsVisibleTo Include="PrestamoBancario.Test" />
   </ItemGroup>
 
   <ItemGroup>
