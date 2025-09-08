@@ -5,6 +5,6 @@ namespace PrestamoBancario.Application.Auth.Querys
 {
     public class LoginQuery : IRequest<UsuarioDto>
     {
-        public UsuarioLoginDto Usuario { get; set; }
+        public UsuarioLoginDto Usuario { get; set; } = default!;
     }
 }

@@ -5,6 +5,6 @@ namespace PrestamoBancario.Application.PrestamosFeature.Querys
 {
     public class GetByIdPrestamoQuery : IRequest<PrestamoDto>
     {
-        public Guid Id { get; set; }
+        public long Id { get; set; }
     }
 }

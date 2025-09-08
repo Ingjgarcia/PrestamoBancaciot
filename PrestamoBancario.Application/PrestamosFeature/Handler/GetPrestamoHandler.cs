@@ -3,6 +3,7 @@ using PrestamoBancario.Application.PrestamosFeature.Dtos;
 using PrestamoBancario.Application.PrestamosFeature.Querys;
 using PrestamoBancario.Domain.Constracts;
 using PrestamoBancario.Domain.Constracts.Repository;
+using PrestamoBancario.Domain.Entities;
 
 namespace PrestamoBancario.Application.PrestamosFeature.Handler
 {
@@ -25,7 +26,7 @@ namespace PrestamoBancario.Application.PrestamosFeature.Handler
                                     cacheKey,
                                     async () =>
                                     {
-                                        return user?.Rol == "Admin"
+                                        return user?.Rol == Roles.Admin
                                             ? await _unitOfWork.Prestamos.GetAllAsync(cancellationToken)
                                             : await _unitOfWork.Prestamos.GetByUserAsync(request.IdUsuario, cancellationToken);
                                     },
@@ -38,7 +39,10 @@ namespace PrestamoBancario.Application.PrestamosFeature.Handler
                 Cantidad = x.Cantidad,
                 Tiempo = x.Tiempo,
                 Estado = x.Estado,
-                IdUsuario = x.IdUsuario,
+                Usuario = x.UsuarioCreacion.Email,
+                FechaCreacion = x.FechaCreacion.ToShortDateString(),
+                FechaModificacion = x.FechaModificacion?.ToShortDateString(),
+                UsuarioModificacion = x.UsuarioModificacion?.Email
             }).ToList();
 
             return response ?? [];

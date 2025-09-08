@@ -7,6 +7,8 @@ using PrestamoBancario.Application.Auth.Querys;
 
 namespace PrestamoBancacio.Api.Controllers
 {
+    [Route("api/auth")]
+    [ApiController]
     public class AuthController : Controller
     {
         private readonly IMediator _mediator;

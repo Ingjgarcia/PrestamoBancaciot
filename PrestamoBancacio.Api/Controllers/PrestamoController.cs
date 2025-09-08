@@ -7,14 +7,17 @@ using PrestamoBancario.Application.PrestamosFeature.Querys;
 
 namespace PrestamoBancacio.Api.Controllers
 {
+    [Route("api/prestamos")]
+    [ApiController]
+    [Authorize]
+
     public class PrestamoController : Controller
     {
         private readonly IMediator _mediator;
 
         public PrestamoController (IMediator mediator) => _mediator = mediator;
-        private Guid GetUserId() => Guid.Parse(User.FindFirst("Userid")!.Value);
+        private int GetUserId() => int.Parse(User.FindFirst("Userid")!.Value);
 
-        [Authorize]
         [HttpPost("Add")]
         public async Task<PrestamoDto> Add([FromBody] PrestamoCreateDto req, CancellationToken ct)
         {
@@ -22,19 +25,17 @@ namespace PrestamoBancacio.Api.Controllers
             return await _mediator.Send(new AddPrestamoCommand() { Prestamo = req });
         }
 
-        [Authorize]
-        [HttpGet("{id:guid}")]
-        public async Task<PrestamoDto> GetById(Guid id, CancellationToken ct)
+        [HttpGet("{id:long}")]
+        public async Task<PrestamoDto> GetById(long id, CancellationToken ct)
         {
             var prestamo = await _mediator.Send(new GetByIdPrestamoQuery { Id = id }, ct);
 
-            if (User.IsInRole("User") && prestamo.IdUsuario != GetUserId())
-                throw new AccessViolationException("no tiene permiso para esta accion");
+            //if (User.IsInRole("User") && prestamo.IdUsuario != GetUserId())
+            //    throw new AccessViolationException("no tiene permiso para esta accion");
 
             return prestamo;
         }
 
-        [Authorize]
         [HttpGet("GetAll")]
         public async Task<IEnumerable<PrestamoDto>> GetAll(CancellationToken ct)
         {
@@ -49,15 +50,15 @@ namespace PrestamoBancacio.Api.Controllers
         }
 
         [Authorize(Policy = "AdminOnly")]
-        [HttpPost("{id:guid}/approbar")]
-        public async Task Approbar(Guid id, CancellationToken ct)
+        [HttpPost("{id:long}/approbar")]
+        public async Task Approbar(long id, CancellationToken ct)
         {
             await _mediator.Send(new AprobarPrestamoCommand { Id = id, AdminUser = GetUserId() }, ct);
         }
 
         [Authorize(Policy = "AdminOnly")]
-        [HttpPost("{id:guid}/rechazar")]
-        public async Task Rechazar(Guid id, CancellationToken ct)
+        [HttpPost("{id:long}/rechazar")]
+        public async Task Rechazar(long id, CancellationToken ct)
         {
             await _mediator.Send(new RechazarPrestamoCommand { Id = id, AdminUser = GetUserId() }, ct);
 

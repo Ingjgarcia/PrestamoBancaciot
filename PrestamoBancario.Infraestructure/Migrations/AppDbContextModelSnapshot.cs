@@ -24,9 +24,11 @@ namespace PrestamoBancario.Infraestructure.Migrations
 
             modelBuilder.Entity("PrestamoBancario.Domain.Entities.Prestamo", b =>
                 {
-                    b.Property<Guid>("Id")
+                    b.Property<long>("Id")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("uuid");
+                        .HasColumnType("bigint");
+
+                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<long>("Id"));
 
                     b.Property<decimal>("Cantidad")
                         .HasPrecision(18, 2)
@@ -41,16 +43,18 @@ namespace PrestamoBancario.Infraestructure.Migrations
                     b.Property<DateTime?>("FechaModificacion")
                         .HasColumnType("timestamp with time zone");
 
-                    b.Property<Guid>("IdUsuario")
-                        .HasColumnType("uuid");
+                    b.Property<long>("IdUsuario")
+                        .HasColumnType("bigint");
+
+                    b.Property<long?>("IdUsuarioModificacion")
+                        .HasColumnType("bigint");
 
                     b.Property<int>("Tiempo")
                         .HasColumnType("integer");
 
-                    b.Property<Guid?>("UsuarioModificacion")
-                        .HasColumnType("uuid");
-
                     b.HasKey("Id");
+
+                    b.HasIndex("IdUsuarioModificacion");
 
                     b.HasIndex("IdUsuario", "FechaCreacion");
 
@@ -59,9 +63,11 @@ namespace PrestamoBancario.Infraestructure.Migrations
 
             modelBuilder.Entity("PrestamoBancario.Domain.Entities.Usuario", b =>
                 {
-                    b.Property<Guid>("Id")
+                    b.Property<long>("Id")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("uuid");
+                        .HasColumnType("bigint");
+
+                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<long>("Id"));
 
                     b.Property<string>("Constrasena")
                         .IsRequired()
@@ -84,6 +90,31 @@ namespace PrestamoBancario.Infraestructure.Migrations
                         .IsUnique();
 
                     b.ToTable("Usuarios");
+                });
+
+            modelBuilder.Entity("PrestamoBancario.Domain.Entities.Prestamo", b =>
+                {
+                    b.HasOne("PrestamoBancario.Domain.Entities.Usuario", "UsuarioCreacion")
+                        .WithMany("PrestamosCreados")
+                        .HasForeignKey("IdUsuario")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.HasOne("PrestamoBancario.Domain.Entities.Usuario", "UsuarioModificacion")
+                        .WithMany("PrestamosModificados")
+                        .HasForeignKey("IdUsuarioModificacion")
+                        .OnDelete(DeleteBehavior.Restrict);
+
+                    b.Navigation("UsuarioCreacion");
+
+                    b.Navigation("UsuarioModificacion");
+                });
+
+            modelBuilder.Entity("PrestamoBancario.Domain.Entities.Usuario", b =>
+                {
+                    b.Navigation("PrestamosCreados");
+
+                    b.Navigation("PrestamosModificados");
                 });
 #pragma warning restore 612, 618
         }

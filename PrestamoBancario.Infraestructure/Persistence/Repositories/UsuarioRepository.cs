@@ -16,6 +16,6 @@ internal class UsuarioRepository : IUsuarioRepository
     public Task<Usuario?> GetByEmailAsync(string email, CancellationToken ct)
         => _db.Usuarios.FirstOrDefaultAsync(u => u.Email == email, ct);
 
-    public Task<Usuario?> GetByIdAsync(Guid id, CancellationToken ct)
+    public Task<Usuario?> GetByIdAsync(long id, CancellationToken ct)
         => _db.Usuarios.FirstOrDefaultAsync(u => u.Id == id, ct);
 }

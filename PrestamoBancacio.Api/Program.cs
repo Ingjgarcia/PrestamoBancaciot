@@ -50,6 +50,14 @@ builder.Services.AddSwaggerGen(options =>
     });
 });
 
+builder.Services.AddCors(options =>
+{
+    options.AddPolicy("AllowLocalhost",
+        builder => builder.WithOrigins("http://localhost:5173")
+                          .AllowAnyMethod()
+                          .AllowAnyHeader());
+});
+
 
 // JWT
 var key = builder.Configuration["Jwt:Key"] ?? "dev-secret";
@@ -93,6 +101,7 @@ if (app.Environment.IsDevelopment())
 app.UseHttpsRedirection();
 app.UseAuthentication();
 app.UseAuthorization();
+app.UseCors("AllowLocalhost");
 app.MapControllers();
 
 app.Run();

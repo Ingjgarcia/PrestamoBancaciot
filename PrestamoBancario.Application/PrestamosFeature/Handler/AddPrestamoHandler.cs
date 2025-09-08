@@ -35,6 +35,7 @@ namespace PrestamoBancario.Application.PrestamosFeature.Handler
                 Cantidad = prestamo.Cantidad,
                 Tiempo = prestamo.Tiempo,
                 Estado = prestamo.Estado,
+                FechaCreacion = prestamo.FechaCreacion.ToShortDateString()
             };
 
             return response;

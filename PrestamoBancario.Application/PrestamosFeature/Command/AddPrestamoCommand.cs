@@ -5,6 +5,6 @@ namespace PrestamoBancario.Application.PrestamosFeature.Command
 {
     public class AddPrestamoCommand : IRequest<PrestamoDto>
     {
-        public PrestamoCreateDto Prestamo { get; set; }
+        public PrestamoCreateDto Prestamo { get; set; } = default!;
     }
 }

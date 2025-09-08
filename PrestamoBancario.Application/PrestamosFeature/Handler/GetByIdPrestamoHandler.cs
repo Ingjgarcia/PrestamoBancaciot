@@ -20,13 +20,18 @@ namespace PrestamoBancario.Application.PrestamosFeature.Handler
         {
             var cacheKey = $"prestamo:{request.Id}";
             var prestamo = await _cache.GetOrSetAsync(cacheKey, async () => await _unitOfWork.Prestamos.GetByIdAsync(request.Id, cancellationToken), TimeSpan.FromSeconds(30)) ?? throw new KeyNotFoundException("Prestamo no encontrado");
-           
+
+
             var response = new PrestamoDto()
             {
                 Id = prestamo.Id,
                 Cantidad = prestamo.Cantidad,
                 Tiempo = prestamo.Tiempo,
                 Estado = prestamo.Estado,
+                //IdUsuario = usuario?.Email??"",
+                FechaCreacion = prestamo.FechaCreacion.ToShortDateString(),
+                FechaModificacion = prestamo.FechaModificacion?.ToShortDateString(),
+                //UsuarioModificacion = admin?.Email
             };
 
             return response;

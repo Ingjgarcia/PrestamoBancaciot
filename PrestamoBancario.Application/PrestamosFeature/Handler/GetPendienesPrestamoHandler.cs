@@ -2,6 +2,7 @@
 using PrestamoBancario.Application.PrestamosFeature.Dtos;
 using PrestamoBancario.Application.PrestamosFeature.Querys;
 using PrestamoBancario.Domain.Constracts;
+using PrestamoBancario.Domain.Entities;
 
 namespace PrestamoBancario.Application.PrestamosFeature.Handler
 {
@@ -17,13 +18,18 @@ namespace PrestamoBancario.Application.PrestamosFeature.Handler
         public async Task<IEnumerable<PrestamoDto>> Handle(GetPendientesPrestamoQuery request, CancellationToken cancellationToken)
         {
             var prestamos = await _unitOfWork.Prestamos.GetPendingAsync(cancellationToken);
+           
+
             var response = prestamos.Select(x => new PrestamoDto
             {
                 Id = x.Id,
                 Cantidad = x.Cantidad,
                 Tiempo = x.Tiempo,
                 Estado = x.Estado,
-                IdUsuario = x.IdUsuario
+                Usuario = x.UsuarioCreacion.Email,
+                FechaCreacion = x.FechaCreacion.ToShortDateString(),
+                FechaModificacion = x.FechaModificacion?.ToShortDateString(),
+                UsuarioModificacion = x.UsuarioModificacion?.Email
             }).ToList();
 
             return response;
